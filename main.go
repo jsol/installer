@@ -1,6 +1,7 @@
 package main
 
 import (
+  _ "embed"
 	"errors"
 	"flag"
 	"fmt"
@@ -13,6 +14,8 @@ import (
 )
 
 var basePath string
+//go:embed git-describe.txt
+var gitDescribe string
 
 func scriptPath(name, script string) string {
 	return path.Join(basePath, name, script+".sh")
@@ -213,18 +216,23 @@ func main() {
 	flag.Parse()
 	args := flag.Args()
 
+	if len(args) == 0 {
+		printUsage()
+		return
+	}
+
+	if args[0] == "version" {
+    fmt.Println(gitDescribe)
+    return
+  }
+
   var ok bool
   basePath, ok = os.LookupEnv("INSTALLER_BASEDIR")
   if !ok {
     fmt.Println("Ensure that the env INSTALLER_BASEDIR points at the root of the install scripts")
   }
 
-	if len(args) == 0 {
-		printUsage()
-		return
-	}
-
-	if args[0] == "update" {
+  if args[0] == "update" {
 		setupTmp()
 		updateAll()
 	} else if args[0] == "install" {
