@@ -189,7 +189,7 @@ func updateAll() {
 	var wg sync.WaitGroup
 
 	for _, e := range entries {
-		if !e.IsDir() {
+		if !e.IsDir() || e.Name()[0] == '.' {
 			continue
 		}
 		wg.Add(1)
